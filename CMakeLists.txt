@@ -20,16 +20,16 @@ include(ProcessorCount)
 ProcessorCount(NUM_PROCESSORS)
 set(MAKE_JOB_COUNT ${NUM_PROCESSORS} CACHE STRING "Number of jobs to use when building libcurl")
 
-include (ExternalProject)
-ExternalProject_Add(curl
+include(FetchContent)
+FetchContent_Declare(curl)
+
+FetchContent_Populate(
+  curl
   URL "https://github.com/curl/curl/releases/download/curl-7_85_0/curl-7.85.0.tar.gz"
   URL_MD5 "4e9eb4f434e9be889e510f038754d3de"
-  BUILD_IN_SOURCE 1
   DOWNLOAD_EXTRACT_TIMESTAMP 0
   SOURCE_DIR ${CMAKE_BINARY_DIR}/curl
-  CONFIGURE_COMMAND ${CMAKE_BINARY_DIR}/curl/configure --prefix=${CMAKE_BINARY_DIR} --disable-ftp --disable-ldap --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-smtp --disable-gopher --without-ssl --disable-crypto-auth --without-axtls --without-zlib --disable-rtsp --enable-shared=no --enable-static=yes --with-pic --without-brotli
-  BUILD_COMMAND make -j${MAKE_JOB_COUNT}
-  INSTALL_COMMAND make install
+  UPDATE_COMMAND test -f ${CMAKE_BINARY_DIR}/bin/curl || ${CMAKE_BINARY_DIR}/curl/configure --prefix=${CMAKE_BINARY_DIR} --disable-ftp --disable-ldap --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-smtp --disable-gopher --without-ssl --disable-crypto-auth --without-axtls --without-zlib --disable-rtsp --enable-shared=no --enable-static=yes --with-pic --without-brotli && make -j${MAKE_JOB_COUNT} && make install
 )
 
 add_library(libcurl INTERFACE IMPORTED GLOBAL)
@@ -166,7 +166,7 @@ target_sources(dd_trace_cpp PUBLIC
   src/datadog/version.h
 )
 
-add_dependencies(dd_trace_cpp curl)
+add_dependencies(dd_trace_cpp libcurl)
 
 # Make the build libcurl visible to dd_trace_cpp, but not to its dependents.
 target_include_directories(dd_trace_cpp PRIVATE ${CMAKE_BINARY_DIR}/include)
