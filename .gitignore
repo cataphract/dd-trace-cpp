@@ -13,3 +13,8 @@
 /bazel-*
 /.build/
 /.coverage/
+
+/Debug/
+/build/
+/.cache/
+/compile_commands.json

@@ -38,6 +38,7 @@ target_include_directories(libcurl INTERFACE ${CMAKE_BINARY_DIR}/include)
 execute_process(COMMAND ${CMAKE_BINARY_DIR}/bin/curl-config --static-libs
   OUTPUT_VARIABLE CURL_LINK_OPTS OUTPUT_STRIP_TRAILING_WHITESPACE)
 target_link_options(libcurl INTERFACE "SHELL:${CURL_LINK_OPTS}")
+message(STATUS "curl-config --static-libs: ${CURL_LINK_OPTS}")
 
 if (MSVC)
     add_compile_options(/W4 /WX)
