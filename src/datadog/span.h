@@ -64,6 +64,7 @@ class Span {
   IDGenerator generate_span_id_;
   Clock clock_;
   std::optional<std::chrono::steady_clock::time_point> end_time_;
+  bool allow_internal_tags{};
 
  public:
   // Create a span whose properties are stored in the specified `data` and that
@@ -105,6 +106,8 @@ class Span {
   // its extent.
   bool error() const;
 
+  void set_allow_internal_tags(bool value) noexcept;
+
   // Return the value of the tag having the specified `name`, or return null if
   // there is no such tag.
   std::optional<std::string_view> lookup_tag(std::string_view name) const;
@@ -113,6 +116,8 @@ class Span {
   void set_tag(std::string_view name, std::string_view value);
   // Delete the tag having the specified `name` if it exists.
   void remove_tag(std::string_view name);
+
+  void set_numeric_tag(std::string_view name, double value);
 
   // Set the name of the service associated with this span, e.g.
   // "ingress-nginx-useast1".

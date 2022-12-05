@@ -75,8 +75,12 @@ TimePoint Span::start_time() const { return data_->start; }
 
 bool Span::error() const { return data_->error; }
 
+void Span::set_allow_internal_tags(bool value) noexcept {
+  allow_internal_tags = value;
+}
+
 std::optional<std::string_view> Span::lookup_tag(std::string_view name) const {
-  if (tags::is_internal(name)) {
+  if (!allow_internal_tags && tags::is_internal(name)) {
     return std::nullopt;
   }
 
@@ -88,14 +92,20 @@ std::optional<std::string_view> Span::lookup_tag(std::string_view name) const {
 }
 
 void Span::set_tag(std::string_view name, std::string_view value) {
-  if (!tags::is_internal(name)) {
+  if (allow_internal_tags || !tags::is_internal(name)) {
     data_->tags.insert_or_assign(std::string(name), std::string(value));
   }
 }
 
 void Span::remove_tag(std::string_view name) {
-  if (!tags::is_internal(name)) {
+  if (allow_internal_tags || !tags::is_internal(name)) {
     data_->tags.erase(std::string(name));
+  }
+}
+
+void Span::set_numeric_tag(std::string_view name, double value) {
+  if (allow_internal_tags || !tags::is_internal(name)) {
+    data_->numeric_tags.insert_or_assign(std::string{name}, value);
   }
 }
 
